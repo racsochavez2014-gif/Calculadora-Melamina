@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Tableros y Costos de Melamina | Herramienta Gratuita</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-amber-400 selection:text-slate-950">
+
+  <!-- ENCABEZADO -->
+  <header class="bg-slate-900 border-b border-slate-800 py-5 px-4">
+    <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Herramienta Gratuita 2026</span>
+        <h1 class="text-xl sm:text-2xl font-black text-white">Calculadora de Melamina y Presupuestos</h1>
+      </div>
+      <a href="https://go.hotmart.com/V108192785U?ap=3046" target="_blank" rel="noopener noreferrer"
+         class="px-4 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm transition">
+        Aprender Melamina desde Cero →
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL DE LA MICRO APP -->
+  <main class="max-w-4xl w-full mx-auto px-4 py-8 space-y-8 flex-grow">
+
+    <div class="grid lg:grid-cols-12 gap-6">
+      
+      <!-- PANEL IZQUIERDO: PARÁMETROS DEL TABLERO Y COSTOS -->
+      <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5 h-fit">
+        <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3">1. Datos del Tablero y Margen</h2>
+        
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Medida estándar del tablero (cm)</label>
+          <select id="boardSize" onchange="recalculate()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none">
+            <option value="244x122">244 x 122 cm (Estándar 4x8 pies)</option>
+            <option value="250x183">250 x 183 cm (Formato grande)</option>
+            <option value="215x244">215 x 244 cm (Formato medio)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Precio por tablero ($)</label>
+            <input type="number" id="boardPrice" value="45" min="1" oninput="recalculate()"
+                   class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Desperdicio (%)</label>
+            <input type="number" id="wastePercent" value="15" min="0" max="50" oninput="recalculate()"
+                   class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Herrajes / Cortes ($)</label>
+            <input type="number" id="hardwareCost" value="18" min="0" oninput="recalculate()"
+                   class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Ganancia deseada (%)</label>
+            <input type="number" id="profitMargin" value="60" min="0" max="300" oninput="recalculate()"
+                   class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL DERECHO: AGREGAR PIEZAS DEL MUEBLE -->
+      <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h2 class="text-lg font-bold text-white">2. Lista de Piezas del Mueble</h2>
+          <button onclick="clearPieces()" class="text-xs text-red-400 hover:underline">Limpiar lista</button>
+        </div>
+
+        <!-- Formulario para agregar pieza -->
+        <div class="grid grid-cols-12 gap-2.5 items-end bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+          <div class="col-span-12 sm:col-span-4">
+            <label class="block text-[11px] text-slate-400 mb-1">Pieza (opcional)</label>
+            <input type="text" id="pieceName" placeholder="Ej. Lateral"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div class="col-span-4 sm:col-span-2">
+            <label class="block text-[11px] text-slate-400 mb-1">Cant.</label>
+            <input type="number" id="pieceQty" value="2" min="1"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div class="col-span-4 sm:col-span-2">
+            <label class="block text-[11px] text-slate-400 mb-1">Largo (cm)</label>
+            <input type="number" id="pieceLength" placeholder="80" min="1"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div class="col-span-4 sm:col-span-2">
+            <label class="block text-[11px] text-slate-400 mb-1">Ancho (cm)</label>
+            <input type="number" id="pieceWidth" placeholder="40" min="1"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div class="col-span-12 sm:col-span-2">
+            <button onclick="addPiece()" class="w-full py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition">
+              + Agregar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla dinámica de piezas -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-800">
+                <th class="py-2">Pieza</th>
+                <th class="py-2 text-center">Cant.</th>
+                <th class="py-2 text-center">Medidas</th>
+                <th class="py-2 text-right">Área (m²)</th>
+                <th class="py-2 text-right"></th>
+              </tr>
+            </thead>
+            <tbody id="piecesTableBody" class="divide-y divide-slate-800/60 text-slate-200">
+              <!-- Se llena con JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TARJETAS DE RESULTADOS EN TIEMPO REAL -->
+    <div class="grid sm:grid-cols-4 gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-xs text-slate-400">Área Total + Desperdicio</p>
+        <p id="resArea" class="text-2xl font-black text-white mt-1">0.00 m²</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-xs text-slate-400">Tableros a Comprar</p>
+        <p id="resBoards" class="text-2xl font-black text-amber-400 mt-1">0 tableros</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <p class="text-xs text-slate-400">Costo Total Material</p>
+        <p id="resCost" class="text-2xl font-black text-slate-200 mt-1">$0.00</p>
+      </div>
+      <div class="bg-gradient-to-br from-emerald-500/20 to-slate-900 border-2 border-emerald-500/50 rounded-2xl p-5">
+        <p class="text-xs text-emerald-300 font-semibold">Precio Sugerido al Cliente</p>
+        <p id="resPrice" class="text-2xl font-black text-emerald-400 mt-1">$0.00</p>
+      </div>
+    </div>
+
+    <!-- BANNER DE CONVERSIÓN AL CURSO -->
+    <div class="bg-slate-900 border border-amber-400/40 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="space-y-1 text-center sm:text-left">
+        <h3 class="text-base sm:text-lg font-extrabold text-white">¿Quieres aprender a despiezar, armar e instalar muebles como un profesional?</h3>
+        <p class="text-xs sm:text-sm text-slate-400">Accede hoy al curso práctico <strong>Melamina Master 2026</strong> + 6 bonos de planos y guías por solo $25 USD.</p>
+      </div>
+      <a href="https://go.hotmart.com/V108192785U?ap=3046" target="_blank" rel="noopener noreferrer"
+         class="flex-shrink-0 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm transition shadow-lg">
+        VER CURSO COMPLETO →
+      </a>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="py-5 px-4 text-center text-xs text-slate-500 border-t border-slate-900">
+    Calculadora referencial de despiece y presupuestos • Melamina Master 2026
+  </footer>
+
+  <!-- LÓGICA DE LA MICRO APP -->
+  <script>
+    // Piezas precargadas de ejemplo (un velador básico) para que el usuario vea cómo funciona al entrar
+    let pieces = [
+      { name: 'Laterales', qty: 2, length: 60, width: 40 },
+      { name: 'Tapa y Base', qty: 2, length: 45, width: 40 },
+      { name: 'Frente Cajón', qty: 2, length: 44, width: 18 }
+    ];
+
+    function addPiece() {
+      const nameInput = document.getElementById('pieceName');
+      const qty = parseInt(document.getElementById('pieceQty').value, 10);
+      const length = parseFloat(document.getElementById('pieceLength').value);
+      const width = parseFloat(document.getElementById('pieceWidth').value);
+
+      if (!qty || qty <= 0 || !length || length <= 0 || !width || width <= 0) {
+        alert('Por favor ingresa cantidad, largo y ancho válidos.');
+        return;
+      }
+
+      const name = nameInput.value.trim() || `Pieza #${pieces.length + 1}`;
+      pieces.push({ name, qty, length, width });
+
+      nameInput.value = '';
+      document.getElementById('pieceLength').value = '';
+      document.getElementById('pieceWidth').value = '';
+      
+      renderTable();
+      recalculate();
+    }
+
+    function removePiece(index) {
+      pieces.splice(index, 1);
+      renderTable();
+      recalculate();
+    }
+
+    function clearPieces() {
+      pieces = [];
+      renderTable();
+      recalculate();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('piecesTableBody');
+      tbody.innerHTML = '';
+
+      if (pieces.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">Agrega las medidas de tus piezas arriba para calcular.</td></tr>`;
+        return;
+      }
+
+      pieces.forEach((p, idx) => {
+        const areaM2 = ((p.length * p.width) / 10000) * p.qty;
+        const row = `
+          <tr>
+            <td class="py-2.5 font-medium text-white">${p.name}</td>
+            <td class="py-2.5 text-center">${p.qty}</td>
+            <td class="py-2.5 text-center text-slate-400">${p.length} x ${p.width} cm</td>
+            <td class="py-2.5 text-right font-mono">${areaM2.toFixed(2)} m²</td>
+            <td class="py-2.5 text-right">
+              <button onclick="removePiece(${idx})" class="text-slate-500 hover:text-red-400 font-bold px-2">✕</button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function recalculate() {
+      const boardVal = document.getElementById('boardSize').value.split('x');
+      const boardAreaM2 = (parseFloat(boardVal[0]) * parseFloat(boardVal[1])) / 10000;
+      const boardPrice = parseFloat(document.getElementById('boardPrice').value) || 0;
+      const wastePercent = parseFloat(document.getElementById('wastePercent').value) || 0;
+      const hardwareCost = parseFloat(document.getElementById('hardwareCost').value) || 0;
+      const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
+
+      let netAreaM2 = 0;
+      pieces.forEach(p => {
+        netAreaM2 += ((p.length * p.width) / 10000) * p.qty;
+      });
+
+      const totalAreaWithWaste = netAreaM2 * (1 + wastePercent / 100);
+      const boardsNeeded = totalAreaWithWaste > 0 ? Math.ceil(totalAreaWithWaste / boardAreaM2) : 0;
+      const totalMaterialCost = (boardsNeeded * boardPrice) + (totalAreaWithWaste > 0 ? hardwareCost : 0);
+      const suggestedPrice = totalMaterialCost * (1 + profitMargin / 100);
+
+      document.getElementById('resArea').textContent = `${totalAreaWithWaste.toFixed(2)} m²`;
+      document.getElementById('resBoards').textContent = `${boardsNeeded} ${boardsNeeded === 1 ? 'tablero' : 'tableros'}`;
+      document.getElementById('resCost').textContent = `$${totalMaterialCost.toFixed(2)}`;
+      document.getElementById('resPrice').textContent = `$${suggestedPrice.toFixed(2)}`;
+    }
+
+    // Inicializar al cargar
+    renderTable();
+    recalculate();
+  </script>
+
+</body>
+</html>
